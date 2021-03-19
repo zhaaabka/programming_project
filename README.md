@@ -1,7 +1,7 @@
 # Бот-чеклист для ежедневных задач
 краткое описание
 # Подробное описание
-описание
+пока что пусть полежит это https://docs.google.com/document/d/1gC-2KTJtZZbUbAOeMpPtWIBgj2t-zN3oaTtgX_WiMAM/edit?usp=sharing
 # Критерий завершенного проекта
 критерий
 ## Команда проекта
