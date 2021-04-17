@@ -1,6 +1,5 @@
 import telebot
 from telebot import types
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
 TOKEN = '1770257533:AAEhX110czS9QLcUyupCQRxu_aNlhKb1s_g'
 
