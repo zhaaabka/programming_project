@@ -1,12 +1,13 @@
 import telebot
 from telebot import types
+from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 
-TOKEN = '1768268284:AAEmnrx9HHxjZgd6eDmmjgfKptnPAsHY6e0'
+TOKEN = '1770257533:AAEhX110czS9QLcUyupCQRxu_aNlhKb1s_g'
 
 bot = telebot.TeleBot(TOKEN)
 
 new = ''
-look_tasks = []
+look_tasks = {}
 
 @bot.message_handler(commands=['start', 'help'])
 def what_to_do(message):
@@ -21,17 +22,15 @@ def what_to_do(message):
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
     if call.data == 'new':
-        bot.send_message(call.message.chat.id, 'Напишите:');
-        
-        @bot.message_handler(content_types=['text'])
-        def get_new(message):
-            global new;
-            new = message.text;
-            global look_tasks;
-            look_tasks.append(new);
-            bot.send_message(message.from_user.id, 'Добавил :)');
-
+        msg = bot.send_message(call.message.chat.id, 'Напишите:');
+        bot.register_next_step_handler(msg, get_new)
     elif call.data == 'look':
-        bot.send_message(call.message.chat.id, look_tasks);
+        for i in look_tasks.keys():
+            bot.send_message(call.message.chat.id, i);
+
+def get_new(message):
+    new = message.text;
+    look_tasks.update({new: ['data', 'deadline', 'importance']});
+    bot.send_message(message.from_user.id, 'Добавил :)');
 
 bot.polling(none_stop=True)
