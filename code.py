@@ -39,5 +39,8 @@ def callback_inline(call):
         if call.data == i + 'done':
             del look_tasks[i];
             bot.send_message(call.message.chat.id, 'Поздравляю! :)');
+        elif call.data == i + 'delete':
+            del look_tasks[i];
+            bot.send_message(call.message.chat.id, 'Дело удалено!');
 
 bot.polling(none_stop=True)
