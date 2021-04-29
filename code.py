@@ -31,7 +31,7 @@ def new(message, f=None):
 def qstn(message, f=None):
       if message.text == 'Не сортировать':
             for i in look_tasks.keys():
-                  keyboard = types.InlineKeyboardMarkup(row_width = 3)
+                  keyboard = types.InlineKeyboardMarkup(row_width = 2)
                   key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i + 'done');
                   key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i + 'delete');
                   key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i + 'desc')
