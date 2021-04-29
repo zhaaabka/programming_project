@@ -31,10 +31,11 @@ def new(message, f=None):
 def qstn(message, f=None):
       if message.text == 'Не сортировать':
             for i in look_tasks.keys():
-                  keyboard = types.InlineKeyboardMarkup(row_width = 2)
+                  keyboard = types.InlineKeyboardMarkup(row_width = 3)
                   key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i + 'done');
                   key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i + 'delete');
-                  keyboard.add(key_done_task, key_delete_tasks);
+                  key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i + 'desc')
+                  keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
                   bot.send_message(message.from_user.id, text=i, reply_markup=keyboard)
       elif message.text == 'Сортировать дела':
             keyboard3 = types.ReplyKeyboardMarkup(True, True)
@@ -90,5 +91,7 @@ def callback_inline(call):
         elif call.data == i + 'delete':
             del look_tasks[i];
             bot.send_message(call.message.chat.id, 'Дело удалено!');
+        elif call.data == i + 'desc':
+            bot.send_message(call.message.chat.id, look_tasks[i][0])
 
 bot.polling(none_stop=True)
