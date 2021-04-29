@@ -25,7 +25,7 @@ def new(message, f=None):
       bot.register_next_step_handler(sort, qstn)
 
     elif message.text == 'Записать новое дело':
-        msg = bot.send_message(message.from_user.id, 'Напишите:');
+        msg = bot.send_message(message.from_user.id, 'Напишите, как называется ваше дело');
         bot.register_next_step_handler(msg, get_new)
 
 def qstn(message, f=None):
