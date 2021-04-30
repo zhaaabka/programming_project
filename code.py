@@ -92,6 +92,8 @@ def callback_inline(call):
             del look_tasks[i];
             bot.send_message(call.message.chat.id, 'Дело удалено!');
         elif call.data == i + 'desc':
-            bot.send_message(call.message.chat.id, look_tasks[i][0])
+            desc = "Описание: "
+            desc += look_tasks[i][0] + "\n" + "Дедлайн: " + look_tasks[i][1] + "\n" + 'Важность: ' + look_tasks[i][2]
+            bot.send_message(call.message.chat.id, desc)
 
 bot.polling(none_stop=True)
