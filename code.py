@@ -47,7 +47,18 @@ def sort_things(message, f=None):
       if message.text == 'По дедлайну':
             bot.send_message(message.from_user.id, "Пока не умею сортировать по дедлайну :(")
       elif message.text == 'По важности':
-            bot.send_message(message.from_user.id, "Пока не умею сортировать по важности :(") 
+             new_list = []
+            for key in look_tasks.keys():
+                  imp = int(look_tasks[key][2])
+                  task_desc = (key, imp)
+                  new_list.append(task_desc)
+            for i in sorted(new_list, key=lambda x: x[1], reverse=True): #когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
+                  keyboard = types.InlineKeyboardMarkup(row_width = 2)
+                  key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i[0] + 'done');
+                  key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i[0] + 'delete');
+                  key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i[0] + 'desc')
+                  keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
+                  bot.send_message(message.from_user.id, text=i[0], reply_markup=keyboard)
             
 def get_new(message):
     global new  
