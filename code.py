@@ -29,36 +29,36 @@ def new(message, f=None):
         bot.register_next_step_handler(msg, get_new)
 
 def qstn(message, f=None):
-      if message.text == 'Не сортировать':
-            for i in look_tasks.keys():
-                  keyboard = types.InlineKeyboardMarkup(row_width = 2)
-                  key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i + 'done');
-                  key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i + 'delete');
-                  key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i + 'desc')
-                  keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
-                  bot.send_message(message.from_user.id, text=i, reply_markup=keyboard)
-      elif message.text == 'Сортировать дела':
-            keyboard3 = types.ReplyKeyboardMarkup(True, True)
-            keyboard3.row('По дедлайну', 'По важности')
-            sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
-            bot.register_next_step_handler(sort_type, sort_things)
+    if message.text == 'Не сортировать':
+        for i in look_tasks.keys():
+            keyboard = types.InlineKeyboardMarkup(row_width = 2)
+            key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i + 'done');
+            key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i + 'delete');
+            key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i + 'desc')
+            keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
+            bot.send_message(message.from_user.id, text=i, reply_markup=keyboard)
+    elif message.text == 'Сортировать дела':
+        keyboard3 = types.ReplyKeyboardMarkup(True, True)
+        keyboard3.row('По дедлайну', 'По важности')
+        sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
+        bot.register_next_step_handler(sort_type, sort_things)
 
 def sort_things(message, f=None):
-      if message.text == 'По дедлайну':
-            bot.send_message(message.from_user.id, "Пока не умею сортировать по дедлайну :(")
-      elif message.text == 'По важности':
-             new_list = []
-            for key in look_tasks.keys():
-                  imp = int(look_tasks[key][2])
-                  task_desc = (key, imp)
-                  new_list.append(task_desc)
-            for i in sorted(new_list, key=lambda x: x[1], reverse=True): #когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
-                  keyboard = types.InlineKeyboardMarkup(row_width = 2)
-                  key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i[0] + 'done');
-                  key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i[0] + 'delete');
-                  key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i[0] + 'desc')
-                  keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
-                  bot.send_message(message.from_user.id, text=i[0], reply_markup=keyboard)
+    if message.text == 'По дедлайну':
+        bot.send_message(message.from_user.id, "Пока не умею сортировать по дедлайну :(")
+    elif message.text == 'По важности':
+        new_list = []
+        for key in look_tasks.keys():
+            imp = int(look_tasks[key][2])
+            task_desc = (key, imp)
+            new_list.append(task_desc)
+        for i in sorted(new_list, key=lambda x: x[1], reverse=True): #когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
+            keyboard = types.InlineKeyboardMarkup(row_width = 2)
+            key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data= i[0] + 'done');
+            key_delete_tasks= types.InlineKeyboardButton(text='Удалить', callback_data= i[0] + 'delete');
+            key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data = i[0] + 'desc')
+            keyboard.add(key_done_task, key_delete_tasks, key_show_desc);
+            bot.send_message(message.from_user.id, text=i[0], reply_markup=keyboard)
             
 def get_new(message):
     global new  
