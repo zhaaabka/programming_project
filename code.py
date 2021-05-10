@@ -1,6 +1,7 @@
 import telebot
 from telebot import types
 import ast
+import random #чтобы отправлять случайную картинку из списка
 
 TOKEN = '1768268284:AAEmnrx9HHxjZgd6eDmmjgfKptnPAsHY6e0'
 
@@ -9,6 +10,9 @@ bot = telebot.TeleBot(TOKEN)
 new = ''
 look_tasks = {}
 data_list = [] #можно и словарь типа {"описание": данные, "дедлайн": данные, "важность": данные} сделать, но нужно ли?
+image_list = ['https://images.unsplash.com/photo-1511044568932-338cba0ad803?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80', 'https://images.unsplash.com/photo-1494256997604-768d1f608cac?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1101&q=80']
+#пока в списке две произвольных картинки с котами
+#я думаю, стоит загрузить все нужные нам картинки в отдельную папку на гитхабе + давать ссылки туда, чтобы точно ничего не сломалось
 
 @bot.message_handler(commands=['start', 'help'])
 def what_to_do(message):
@@ -99,6 +103,7 @@ def callback_inline(call):
         if call.data == i + 'done':
             del look_tasks[i];
             bot.send_message(call.message.chat.id, 'Поздравляю! :)');
+            bot.send_photo(call.message.chat.id, random.choice(image_list)) 
         elif call.data == i + 'delete':
             del look_tasks[i];
             bot.send_message(call.message.chat.id, 'Дело удалено!');
