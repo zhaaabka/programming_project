@@ -265,7 +265,36 @@ def dl_edit(message):
     global thing2
     help_list = look_tasks[thing2]
     help_list.pop(1)
-    help_list.insert(1, message.text)
+    date_s = message.text
+    global deadlines_to_print
+    if date_s == "Без дедлайна":
+        help_list.insert(1, datetime.datetime(2222, 2, 22, 23, 59)) 
+        deadlines_to_print[thing2] = "нет"
+    else:
+        is_year = 0
+        for i in date_s:
+            if i == ".":
+                is_year += 1
+        thedate = 0
+        if ":" in date_s:
+            if is_year == 2:
+                thedate = datetime.datetime.strptime(date_s, '%d.%m.%Y %H:%S')
+            else:
+                thedate = datetime.datetime.strptime(date_s, '%d.%m %H:%S')
+                thedate = thedate.replace(year=curr_day.year)
+        else:
+            if is_year == 2:
+                thedate = datetime.datetime.strptime(date_s, '%d.%m.%Y')
+                thedate = thedate.replace(hour=23, minute=59)
+            else:
+                thedate = datetime.datetime.strptime(date_s, '%d.%m')
+                thedate = thedate.replace(year=curr_day.year)
+                thedate = thedate.replace(hour=23, minute=59)
+        
+        deadlines_to_print[thing2] = "{}.{}.{} {}:{}".format(thedate.day, thedate.month, thedate.year, thedate.hour, thedate.minute)
+        help_list.insert(1, thedate)
+    keyboard = types.ReplyKeyboardRemove(True)
+    
     look_tasks[thing2] = help_list
     thing2 = ''
     bot.send_message(message.from_user.id, "Дедлайн отредактирован!")
@@ -300,7 +329,9 @@ def callback_inline(call):
         elif call.data == i + 'dl':
             global thing2
             thing2 = i
-            new_dl = bot.send_message(call.message.chat.id, 'Введите новый дедлайн')
+            keyboard = types.ReplyKeyboardMarkup(True)
+            keyboard.row('Без дедлайна')
+            new_dl = bot.send_message(call.message.chat.id, 'Введите новый дедлайн или нажмите кнопку ниже', reply_markup=keyboard)
             bot.register_next_step_handler(new_dl, dl_edit)
         elif call.data == i + 'imp':
             global thing3
