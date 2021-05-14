@@ -73,7 +73,8 @@ send_rem()
 @bot.message_handler(commands=['start'])
 def what_to_do(message):
     keyboard = types.ReplyKeyboardMarkup(True, True)
-    keyboard.row('Записать новое дело', 'Посмотреть записанные дела', 'Создать напоминание', 'Посмотреть напоминания')
+    keyboard.row('Записать новое дело', 'Посмотреть записанные дела')
+    keyboard.row('Создать напоминание', 'Посмотреть напоминания')
     bot.send_message(message.from_user.id, 'Что Вы хотите сделать?', reply_markup=keyboard)
 
 
@@ -84,7 +85,8 @@ def new(message, f=None):
             bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)")
         else:
             keyboard2 = types.ReplyKeyboardMarkup(True, True)
-            keyboard2.row('Сортировать дела', 'Не сортировать')
+            keyboard2.row('Сортировать по дедлайну', 'Сортировать по важности')
+            keyboard2.row('Не сортировать')
             sort = bot.send_message(message.from_user.id, "Сортировать дела?", reply_markup=keyboard2)
             bot.register_next_step_handler(sort, qstn)
 
@@ -131,22 +133,14 @@ def qstn(message, f=None):
 Дедлайн: {}
 Важность: {}'''.format(i, look_tasks[i][0], deadlines_to_print[i], look_tasks[i][2])
             bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
-    elif message.text == 'Сортировать дела':
-        keyboard3 = types.ReplyKeyboardMarkup(True, True)
-        keyboard3.row('По дедлайну', 'По важности')
-        sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
-        bot.register_next_step_handler(sort_type, sort_things)
-
-
-def sort_things(message, f=None):
-    if message.text == 'По дедлайну':
+    elif message.text == 'Сортировать по дедлайну':
         new_list = []
         for key in look_tasks.keys():
             dl = look_tasks[key][1]
             imp = int(look_tasks[key][2])
             task_desc = (key, dl, imp)
             new_list.append(task_desc)
-        for i in sorted(sorted (new_list, key=lambda x: x[2], reverse=True), key=lambda x: x[1]): 
+        for i in sorted(sorted (new_list, key=lambda x: x[2], reverse=True), key=lambda x: x[1]):
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
@@ -156,19 +150,20 @@ def sort_things(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
+            #global deadlines_to_print
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
 Важность: {}'''.format(m, look_tasks[m][0], deadlines_to_print[m], look_tasks[m][2])
             bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
-    elif message.text == 'По важности':
+    elif message.text == 'Сортировать по важности':
         new_list = []
         for key in look_tasks.keys():
             dl = look_tasks[key][1]
             imp = int(look_tasks[key][2])
             task_desc = (key, dl, imp)
             new_list.append(task_desc)
-        for i in sorted(sorted(new_list, key=lambda x: x[1]), key=lambda x: x[2], reverse=True): 
+        for i in sorted(sorted(new_list, key=lambda x: x[1]), key=lambda x: x[2], reverse=True):  # когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
@@ -178,14 +173,12 @@ def sort_things(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            #global deadlines_to_print (мне кажется, не надо?)
+            #global deadlines_to_print
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
 Важность: {}'''.format(m, look_tasks[m][0], deadlines_to_print[m], look_tasks[m][2])
             bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
-            
-
 
 def get_new(message):
     global new
