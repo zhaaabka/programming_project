@@ -135,9 +135,10 @@ def sort_things(message, f=None):
         new_list = []
         for key in look_tasks.keys():
             dl = look_tasks[key][1]
-            task_desc = (key, dl)
+            imp = int(look_tasks[key][2])
+            task_desc = (key, dl, imp)
             new_list.append(task_desc)
-        for i in sorted (new_list, key=lambda x: x[1]):
+        for i in sorted(sorted (new_list, key=lambda x: x[2], reverse=True), key=lambda x: x[1]): 
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
@@ -155,11 +156,11 @@ def sort_things(message, f=None):
     elif message.text == 'По важности':
         new_list = []
         for key in look_tasks.keys():
+            dl = look_tasks[key][1]
             imp = int(look_tasks[key][2])
-            task_desc = (key, imp)
+            task_desc = (key, dl, imp)
             new_list.append(task_desc)
-        for i in sorted(new_list, key=lambda x: x[1],
-                        reverse=True):  # когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
+        for i in sorted(sorted(new_list, key=lambda x: x[1]), key=lambda x: x[2], reverse=True): 
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
@@ -205,7 +206,7 @@ def add_data2(message):
     global new
     global deadlines_to_print
     if date_s == "Без дедлайна":
-        data_list.append("нет дедлайна") #можно сформулировать идею отсутствия дедлайна как-то по-другому, но через None нельзя 
+        data_list.append(None)  
         deadlines_to_print[new] = "Нет"
     else:
         is_year = 0
