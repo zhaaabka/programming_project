@@ -206,7 +206,7 @@ def add_data2(message):
     global new
     global deadlines_to_print
     if date_s == "Без дедлайна":
-        data_list.append(None)  
+        data_list.append(datetime.datetime(2222, 2, 22, 23, 59))  #какое-то абстрактное далёкое будущее для дел без дедлайнов; дату можно изменить
         deadlines_to_print[new] = "Нет"
     else:
         is_year = 0
