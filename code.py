@@ -150,7 +150,7 @@ def qstn(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            #global deadlines_to_print
+            #global deadlines_to_print (кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
@@ -163,7 +163,7 @@ def qstn(message, f=None):
             imp = int(look_tasks[key][2])
             task_desc = (key, dl, imp)
             new_list.append(task_desc)
-        for i in sorted(sorted(new_list, key=lambda x: x[1]), key=lambda x: x[2], reverse=True):  # когда разберёмся с дедлайнами, будет многоуровневая: сначала по важности, потом по дл
+        for i in sorted(sorted(new_list, key=lambda x: x[1]), key=lambda x: x[2], reverse=True): 
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
@@ -173,7 +173,7 @@ def qstn(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            #global deadlines_to_print
+            #global deadlines_to_print (кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
