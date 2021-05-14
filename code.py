@@ -72,10 +72,13 @@ def what_to_do(message):
 @bot.message_handler(content_types=['text'])
 def new(message, f=None):
     if message.text == 'Посмотреть записанные дела':
-        keyboard2 = types.ReplyKeyboardMarkup(True, True)
-        keyboard2.row('Сортировать дела', 'Не сортировать')
-        sort = bot.send_message(message.from_user.id, "Сортировать дела?", reply_markup=keyboard2)
-        bot.register_next_step_handler(sort, qstn)
+        if len(look_tasks) == 0:
+            bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)")
+        else:
+            keyboard2 = types.ReplyKeyboardMarkup(True, True)
+            keyboard2.row('Сортировать дела', 'Не сортировать')
+            sort = bot.send_message(message.from_user.id, "Сортировать дела?", reply_markup=keyboard2)
+            bot.register_next_step_handler(sort, qstn)
 
     elif message.text == 'Записать новое дело':
         msg = bot.send_message(message.from_user.id, 'Напишите, как называется ваше дело')
@@ -105,33 +108,27 @@ def new(message, f=None):
 
 def qstn(message, f=None):
     if message.text == 'Не сортировать':
-        if len(look_tasks) == 0:
-            bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)")
-        else:
-            for i in look_tasks.keys():
-                keyboard = types.InlineKeyboardMarkup(row_width=2)
-                key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i + 'done')
-                key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i + 'delete')
-                key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data=i + 'desc')
-                keyboard.add(key_done_task, key_delete_tasks, key_show_desc)
-                key_edit_desc = types.InlineKeyboardButton(text='Править описание', callback_data=i + 'edit_desc')
-                key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i + 'dl')
-                key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i + 'imp')
-                keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
-                global deadlines_to_print
-                to_print = '''📌 "{}"
+        for i in look_tasks.keys():
+            keyboard = types.InlineKeyboardMarkup(row_width=2)
+            key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i + 'done')
+            key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i + 'delete')
+            key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data=i + 'desc')
+            keyboard.add(key_done_task, key_delete_tasks, key_show_desc)
+            key_edit_desc = types.InlineKeyboardButton(text='Править описание', callback_data=i + 'edit_desc')
+            key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i + 'dl')
+            key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i + 'imp')
+            keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
+            global deadlines_to_print
+            to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
 Важность: {}'''.format(i, look_tasks[i][0], deadlines_to_print[i], look_tasks[i][2])
-                bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
+            bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
     elif message.text == 'Сортировать дела':
-        if len(look_tasks) == 0:
-            bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)")
-        else:
-            keyboard3 = types.ReplyKeyboardMarkup(True, True)
-            keyboard3.row('По дедлайну', 'По важности')
-            sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
-            bot.register_next_step_handler(sort_type, sort_things)
+        keyboard3 = types.ReplyKeyboardMarkup(True, True)
+        keyboard3.row('По дедлайну', 'По важности')
+        sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
+        bot.register_next_step_handler(sort_type, sort_things)
 
 
 def sort_things(message, f=None):
