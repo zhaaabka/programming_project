@@ -112,8 +112,7 @@ def qstn(message, f=None):
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i + 'delete')
-            key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data=i + 'desc')
-            keyboard.add(key_done_task, key_delete_tasks, key_show_desc)
+            keyboard.add(key_done_task, key_delete_tasks)
             key_edit_desc = types.InlineKeyboardButton(text='Править описание', callback_data=i + 'edit_desc')
             key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i + 'dl')
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i + 'imp')
@@ -145,13 +144,19 @@ def sort_things(message, f=None):
             keyboard = types.InlineKeyboardMarkup(row_width=2)
             key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
             key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
-            key_show_desc = types.InlineKeyboardButton(text='Посмотреть описание', callback_data=i[0] + 'desc')
-            keyboard.add(key_done_task, key_delete_tasks, key_show_desc)
+            keyboard.add(key_done_task, key_delete_tasks)
             key_edit_desc = types.InlineKeyboardButton(text='Править описание', callback_data=i[0] + 'edit_desc')
             key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i[0] + 'dl')
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
-            bot.send_message(message.from_user.id, text=i[0], reply_markup=keyboard)
+            m = i[0]
+            global deadlines_to_print
+            to_print = '''📌 "{}"
+Описание: {}
+Дедлайн: {}
+Важность: {}'''.format(m, look_tasks[m][0], deadlines_to_print[m], look_tasks[m][2])
+            bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
+            
 
 
 def get_new(message):
@@ -267,10 +272,6 @@ def callback_inline(call):
         elif call.data == i + 'delete':
             del look_tasks[i]
             bot.send_message(call.message.chat.id, 'Дело удалено')
-        elif call.data == i + 'desc':
-            desc = "Описание: "
-            desc += look_tasks[i][0] + "\n" + "Дедлайн: " + look_tasks[i][1] + "\n" + 'Важность: ' + look_tasks[i][2]
-            bot.send_message(call.message.chat.id, desc)
         elif call.data == i + 'edit_desc':
             global thing
             thing = i
