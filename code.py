@@ -180,7 +180,7 @@ def add_data2(message):
     global new
     global deadlines_to_print
     if date_s == "Без дедлайна":
-        data_list.append(None) #не знаю что сюда положить
+        data_list.append("нет дедлайна") #можно сформулировать идею отсутствия дедлайна как-то по-другому, но через None нельзя 
         deadlines_to_print[new] = "Нет"
     else:
         is_year = 0
