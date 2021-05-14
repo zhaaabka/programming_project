@@ -10,6 +10,7 @@ TOKEN = '1768268284:AAEmnrx9HHxjZgd6eDmmjgfKptnPAsHY6e0'
 
 bot = telebot.TeleBot(TOKEN)
 
+remover = types.ReplyKeyboardRemove()
 chat_id = 0
 old_desc_rem_ind = 0
 old_time_rem = 0
@@ -58,7 +59,9 @@ def send_rem():
     while True:
         for time_rem in reminders_time_list:
             curr_time = datetime.datetime.today()
-            curr_time_str = "{}.{}.{} {}:{}".format(curr_time.day, curr_time.month, curr_time.year, curr_time.hour, curr_time.minute)
+            curr_time_str = "{}.{}.{} {}:{}".format(curr_time.day, curr_time.month, curr_time.year, curr_time.hour,
+                                                    curr_time.minute)
+            print(curr_time_str, "-----", reminders[time_rem][1])
             if curr_time_str == reminders[time_rem][1]:
                 for i in range(len(reminders[time_rem][0])):
                     to_print = "Напоминание: {}".format(reminders[time_rem][0][i])
@@ -75,7 +78,8 @@ send_rem()
 @bot.message_handler(commands=['start'])
 def what_to_do(message):
     keyboard = types.ReplyKeyboardMarkup(True, True)
-    keyboard.row('Записать новое дело', 'Посмотреть записанные дела', 'Создать напоминание', 'Посмотреть напоминания')
+    keyboard.row('Записать новое дело', 'Посмотреть записанные дела')
+    keyboard.row('Создать напоминание', 'Посмотреть напоминания')
     bot.send_message(message.from_user.id, 'Что Вы хотите сделать?', reply_markup=keyboard)
 
 
@@ -83,26 +87,28 @@ def what_to_do(message):
 def new(message, f=None):
     if message.text == 'Посмотреть записанные дела':
         if len(look_tasks) == 0:
-            bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)")
+            bot.send_message(message.from_user.id, "Список дел пуст\nВы можете отдыхать или добавить новое дело :)",
+                             reply_markup=remover)
         else:
             keyboard2 = types.ReplyKeyboardMarkup(True, True)
-            keyboard2.row('Сортировать дела', 'Не сортировать')
+            keyboard2.row('Сортировать по дедлайну', 'Сортировать по важности')
+            keyboard2.row('Не сортировать')
             sort = bot.send_message(message.from_user.id, "Сортировать дела?", reply_markup=keyboard2)
             bot.register_next_step_handler(sort, qstn)
 
     elif message.text == 'Записать новое дело':
-        msg = bot.send_message(message.from_user.id, 'Напишите, как называется ваше дело')
+        msg = bot.send_message(message.from_user.id, 'Напишите, как называется ваше дело', reply_markup=remover)
         bot.register_next_step_handler(msg, get_new)
 
     elif message.text == 'Создать напоминание':
-        msg = bot.send_message(message.from_user.id, 'О чем мне нужно Вам напомнить?')
+        msg = bot.send_message(message.from_user.id, 'О чем мне нужно Вам напомнить?', reply_markup=remover)
         global chat_id
         chat_id = message.from_user.id
         bot.register_next_step_handler(msg, add_reminder)
 
     elif message.text == 'Посмотреть напоминания':
         if len(reminders_time_list) == 0:
-            bot.send_message(message.from_user.id, "Пока нет никаких напоминаний")
+            bot.send_message(message.from_user.id, "Пока нет никаких напоминаний", reply_markup=remover)
         else:
             for time in reminders_time_list:
                 for i in reminders[time][0]:
@@ -133,15 +139,7 @@ def qstn(message, f=None):
 Дедлайн: {}
 Важность: {}'''.format(i, look_tasks[i][0], deadlines_to_print[i], look_tasks[i][2])
             bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
-    elif message.text == 'Сортировать дела':
-        keyboard3 = types.ReplyKeyboardMarkup(True, True)
-        keyboard3.row('По дедлайну', 'По важности')
-        sort_type = bot.send_message(message.from_user.id, "Как сортировать?", reply_markup=keyboard3)
-        bot.register_next_step_handler(sort_type, sort_things)
-
-
-def sort_things(message, f=None):
-    if message.text == 'По дедлайну':
+    elif message.text == 'Сортировать по дедлайну':
         new_list = []
         for key in look_tasks.keys():
             dl = look_tasks[key][1]
@@ -158,12 +156,13 @@ def sort_things(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
+            # global deadlines_to_print (кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
 Важность: {}'''.format(m, look_tasks[m][0], deadlines_to_print[m], look_tasks[m][2])
             bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
-    elif message.text == 'По важности':
+    elif message.text == 'Сортировать по важности':
         new_list = []
         for key in look_tasks.keys():
             dl = look_tasks[key][1]
@@ -180,7 +179,7 @@ def sort_things(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            # global deadlines_to_print (мне кажется, не надо?)
+            # global deadlines_to_print (кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
@@ -192,7 +191,7 @@ def get_new(message):
     global new
     new = message.text
     look_tasks[new] = []
-    data = bot.send_message(message.from_user.id, 'Введите описание вашего дела')
+    data = bot.send_message(message.from_user.id, 'Введите описание вашего дела', reply_markup=remover)
     bot.register_next_step_handler(data, add_data)
 
 
@@ -259,7 +258,7 @@ def add_data3(message):
     # просто не знаю, как лучше
     data_list = []
     curr_task = {}
-    bot.send_message(message.from_user.id, 'Добавил :)')
+    bot.send_message(message.from_user.id, 'Добавил :)', reply_markup=remover)
 
 
 def desc_edit(message):
@@ -270,7 +269,7 @@ def desc_edit(message):
     help_list.insert(0, message.text)
     look_tasks[thing] = help_list
     thing = ''
-    bot.send_message(message.from_user.id, "Описание отредактировано!")
+    bot.send_message(message.from_user.id, "Описание отредактировано!", reply_markup=remover)
 
 
 def dl_edit(message):
@@ -311,7 +310,7 @@ def dl_edit(message):
 
     look_tasks[thing2] = help_list
     thing2 = ''
-    bot.send_message(message.from_user.id, "Дедлайн отредактирован!")
+    bot.send_message(message.from_user.id, "Дедлайн отредактирован!", reply_markup=remover)
 
 
 def imp_edit(message):
@@ -322,7 +321,7 @@ def imp_edit(message):
     help_list.insert(2, message.text)
     look_tasks[thing3] = help_list
     thing3 = ''
-    bot.send_message(message.from_user.id, "Важность отредактирована!")
+    bot.send_message(message.from_user.id, "Важность отредактирована!", reply_markup=remover)
 
 
 @bot.callback_query_handler(func=lambda call: True)
@@ -330,15 +329,16 @@ def callback_inline(call):
     for i in list(look_tasks):
         if call.data == i + 'done':
             del look_tasks[i]
-            bot.send_message(call.message.chat.id, 'Вы молодец! Поздравляю с успешно выполненным делом :)')
+            bot.send_message(call.message.chat.id, 'Вы молодец! Поздравляю с успешно выполненным делом :)',
+                             reply_markup=remover)
             bot.send_photo(call.message.chat.id, random.choice(image_list))
         elif call.data == i + 'delete':
             del look_tasks[i]
-            bot.send_message(call.message.chat.id, 'Дело удалено')
+            bot.send_message(call.message.chat.id, 'Дело удалено', reply_markup=remover)
         elif call.data == i + 'edit_desc':
             global thing
             thing = i
-            new_desc = bot.send_message(call.message.chat.id, 'Введите новое описание')
+            new_desc = bot.send_message(call.message.chat.id, 'Введите новое описание', reply_markup=remover)
             bot.register_next_step_handler(new_desc, desc_edit)
         elif call.data == i + 'dl':
             global thing2
@@ -351,7 +351,8 @@ def callback_inline(call):
         elif call.data == i + 'imp':
             global thing3
             thing3 = i
-            new_imp = bot.send_message(call.message.chat.id, 'Введите новое значение важности (1-5)')
+            new_imp = bot.send_message(call.message.chat.id, 'Введите новое значение важности (1-5)',
+                                       reply_markup=remover)
             bot.register_next_step_handler(new_imp, imp_edit)
     for time in reminders_time_list:
         for i in range(len(reminders[time][0])):
@@ -364,21 +365,23 @@ def callback_inline(call):
                 if len(reminders[time][0]) == 0:
                     del reminders[time]
                     reminders_time_list.remove(time)
-                bot.send_message(call.message.chat.id, 'Напоминание удалено')
+                bot.send_message(call.message.chat.id, 'Напоминание удалено', reply_markup=remover)
             elif call.data == reminders[time][0][i] + "ed_desc_rem":
                 new_desc_rem = bot.send_message(call.message.chat.id,
-                                                'Введите новое описание того, о чем мне нужно напомнить')
+                                                'Введите новое описание того, о чем мне нужно напомнить',
+                                                reply_markup=remover)
                 bot.register_next_step_handler(new_desc_rem, desc_rem_edit)
             elif call.data == reminders[time][0][i] + "ed_time_rem":
                 new_time_rem = bot.send_message(call.message.chat.id,
-                                                'Введите новое время, когда хотите получить напоминание')
+                                                'Введите новое время, когда хотите получить напоминание',
+                                                reply_markup=remover)
                 bot.register_next_step_handler(new_time_rem, time_rem_edit)
 
 
 def desc_rem_edit(message):
     global reminders
     reminders[old_time_rem][0][old_desc_rem_ind] = message.text
-    bot.send_message(message.from_user.id, "Напоминание отредактировано!")
+    bot.send_message(message.from_user.id, "Напоминание отредактировано!", reply_markup=remover)
 
 
 def time_rem_edit(message):
@@ -427,11 +430,12 @@ def reminder_added(message):
         thedate = datetime.datetime.strptime(time_to_remind, '%d.%m %H:%M')
         thedate = thedate.replace(year=curr_day.year)
     if reminders.get(thedate, None) is None:
-        reminders[thedate] = ([], "{}.{}.{} {}:{}".format(thedate.day, thedate.month, thedate.year, thedate.hour, thedate.minute))
+        reminders[thedate] = (
+        [], "{}.{}.{} {}:{}".format(thedate.day, thedate.month, thedate.year, thedate.hour, thedate.minute))
     reminders[thedate][0].append(curr_reminder)
     reminders_time_list.append(thedate)
     reminders_time_list.sort()
-    bot.send_message(message.from_user.id, 'Добавлено! :)')
+    bot.send_message(message.from_user.id, 'Добавлено! :)', reply_markup=remover)
 
 
 bot.polling(none_stop=True)
