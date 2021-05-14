@@ -132,7 +132,26 @@ def qstn(message, f=None):
 
 def sort_things(message, f=None):
     if message.text == 'По дедлайну':
-        bot.send_message(message.from_user.id, "Пока не умею сортировать по дедлайну :(")
+        new_list = []
+        for key in look_tasks.keys():
+            dl = look_tasks[key][1]
+            task_desc = (key, dl)
+            new_list.append(task_desc)
+        for i in sorted (new_list, key=lambda x: x[1]):
+            keyboard = types.InlineKeyboardMarkup(row_width=2)
+            key_done_task = types.InlineKeyboardButton(text='Сделано', callback_data=i[0] + 'done')
+            key_delete_tasks = types.InlineKeyboardButton(text='Удалить', callback_data=i[0] + 'delete')
+            keyboard.add(key_done_task, key_delete_tasks)
+            key_edit_desc = types.InlineKeyboardButton(text='Править описание', callback_data=i[0] + 'edit_desc')
+            key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i[0] + 'dl')
+            key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
+            keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
+            m = i[0]
+            to_print = '''📌 "{}"
+Описание: {}
+Дедлайн: {}
+Важность: {}'''.format(m, look_tasks[m][0], deadlines_to_print[m], look_tasks[m][2])
+            bot.send_message(message.from_user.id, text=to_print, reply_markup=keyboard)
     elif message.text == 'По важности':
         new_list = []
         for key in look_tasks.keys():
@@ -150,7 +169,7 @@ def sort_things(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            global deadlines_to_print
+            #global deadlines_to_print (мне кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
