@@ -52,7 +52,7 @@ def send_rem():
             curr_time_str = "{}.{}.{} {}:{}".format(curr_time.day, curr_time.month, curr_time.year, curr_time.hour, curr_time.minute)
             print(curr_time_str, "-----", reminders[time_rem][1])
             if curr_time_str == reminders[time_rem][1]:
-                for i in reminders[time_rem][0]:
+                for i in range(len(reminders[time_rem][0])):
                     to_print = "Напоминание: {}".format(reminders[time_rem][0][i])
                     bot.send_message(chat_id, text=to_print)
                     reminders[time_rem][0].remove(reminders[time_rem][0][i])
@@ -85,8 +85,6 @@ def new(message, f=None):
         msg = bot.send_message(message.from_user.id, 'О чем мне нужно Вам напомнить?')
         global chat_id
         chat_id = message.from_user.id
-        global curr_reminder
-        curr_reminder = msg.text
         bot.register_next_step_handler(msg, add_reminder)
 
     elif message.text == 'Посмотреть напоминания':
@@ -322,9 +320,9 @@ def time_rem_edit(message):
             is_year += 1
     thedate = 0
     if is_year == 2:
-        thedate = datetime.datetime.strptime(new_time, '%d.%m.%Y %H:%S')
+        thedate = datetime.datetime.strptime(new_time, '%d.%m.%Y %H:%M')
     else:
-        thedate = datetime.datetime.strptime(new_time, '%d.%m %H:%S')
+        thedate = datetime.datetime.strptime(new_time, '%d.%m %H:%M')
         thedate = thedate.replace(year=curr_day.year)
     reminders_time_list.append(thedate)
     reminders[thedate] = reminders[old_time_rem]
@@ -334,6 +332,8 @@ def time_rem_edit(message):
     bot.send_message(message.from_user.id, "Время напоминания отредактировано!")
 
 def add_reminder(message):
+    global curr_reminder
+    curr_reminder = message.text
     time_to_remind = bot.send_message(message.from_user.id, '''Когда Вы хотите, чтобы я Вам об этом напомнил?
 Присылайте ответ в формате *дд.мм.гггг чч:мм*
 Год можно не указывать, тогда автоматически поставится текущий.''')
@@ -348,9 +348,9 @@ def reminder_added(message):
             is_year += 1
     thedate = 0
     if is_year == 2:
-        thedate = datetime.datetime.strptime(time_to_remind, '%d.%m.%Y %H:%S')
+        thedate = datetime.datetime.strptime(time_to_remind, '%d.%m.%Y %H:%M')
     else:
-        thedate = datetime.datetime.strptime(time_to_remind, '%d.%m %H:%S')
+        thedate = datetime.datetime.strptime(time_to_remind, '%d.%m %H:%M')
         thedate = thedate.replace(year=curr_day.year)
     if reminders.get(thedate, None) is None:
         reminders[thedate] = ([], "{}.{}.{} {}:{}".format(thedate.day, thedate.month, thedate.year, thedate.hour, thedate.minute))
