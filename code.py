@@ -287,7 +287,7 @@ def callback_inline(call):
         elif call.data == i + 'imp':
             global thing3
             thing3 = i
-            new_imp = bot.send_message(call.message.chat.id, 'Введите новое значение важности (0-10)')
+            new_imp = bot.send_message(call.message.chat.id, 'Введите новое значение важности (1-5)')
             bot.register_next_step_handler(new_imp, imp_edit)
     for time in reminders_time_list:
         for i in range(len(reminders[time][0])):
