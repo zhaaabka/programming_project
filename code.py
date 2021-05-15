@@ -34,9 +34,8 @@ image_list = [
     'https://images.unsplash.com/photo-1526769928017-c444fdb08d5a?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80',
     'https://images.unsplash.com/photo-1611936159858-53f9a17db6d0?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1050&q=80',
     'https://images.unsplash.com/photo-1519052537078-e6302a4968d4?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80']
-# пока в списке две произвольных картинки с котами
-# я думаю, стоит загрузить все нужные нам картинки в отдельную папку на гитхабе + давать ссылки туда, чтобы точно ничего не сломалось
-thing = ''  # стоит назвать эти переменные как-то нормально... это для редактирования
+
+thing = ''  #для редактирования
 thing2 = ''
 thing3 = ''
 
@@ -155,8 +154,7 @@ def qstn(message, f=None):
             key_edit_dl = types.InlineKeyboardButton(text='Править дедлайн', callback_data=i[0] + 'dl')
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
-            m = i[0]
-            # global deadlines_to_print (кажется, не надо?)
+            m = i[0]  
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
@@ -179,7 +177,6 @@ def qstn(message, f=None):
             key_edit_imp = types.InlineKeyboardButton(text='Править важность', callback_data=i[0] + 'imp')
             keyboard.row(key_edit_desc, key_edit_dl, key_edit_imp)
             m = i[0]
-            # global deadlines_to_print (кажется, не надо?)
             to_print = '''📌 "{}"
 Описание: {}
 Дедлайн: {}
@@ -253,9 +250,6 @@ def add_data3(message):
     data_list.append(data)
     global new
     look_tasks.update({new: data_list})
-    # я пока делала словарь "задача": [описание, дедлайн, важность]
-    # но несложно сделать и словарь "задача": {"описание": данные, "дедлайн": данные, "важность": данные}
-    # просто не знаю, как лучше
     data_list = []
     curr_task = {}
     bot.send_message(message.from_user.id, 'Добавил :)', reply_markup=remover)
